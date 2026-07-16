@@ -1,0 +1,282 @@
+<Window x:Class="ConduitReduction.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:ConduitReduction.Wpf.ViewModels"
+        Title="Conduit Reduction"
+        Width="560" Height="720"
+        MinWidth="480" MinHeight="500"
+        Background="{StaticResource BgBrush}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Topmost="True"
+        ResizeMode="CanResizeWithGrip">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Border Background="{StaticResource BgBrush}"
+            BorderBrush="#1e1e22"
+            BorderThickness="1"
+            CornerRadius="8">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>   <!-- title bar -->
+                <RowDefinition Height="Auto"/>   <!-- classification banner -->
+                <RowDefinition Height="Auto"/>   <!-- stats bar -->
+                <RowDefinition Height="*"/>      <!-- input -->
+                <RowDefinition Height="Auto"/>   <!-- reduce button -->
+                <RowDefinition Height="*"/>      <!-- output -->
+                <RowDefinition Height="Auto"/>   <!-- action buttons -->
+                <RowDefinition Height="Auto"/>   <!-- pass log -->
+            </Grid.RowDefinitions>
+
+            <!-- ── Title bar ──────────────────────────────────────────────── -->
+            <Grid Grid.Row="0"
+                  Background="#0d0d0f"
+                  MouseLeftButtonDown="TitleBar_MouseDown"
+                  Height="40">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Logo + title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal"
+                            VerticalAlignment="Center" Margin="14,0,0,0" >
+                    <Ellipse Width="8" Height="8" Fill="#00c49a">
+                        <Ellipse.Effect>
+                            <DropShadowEffect Color="#00c49a" BlurRadius="6" ShadowDepth="0"/>
+                        </Ellipse.Effect>
+                    </Ellipse>
+                    <TextBlock Text="CONDUIT" FontFamily="{StaticResource MonoFont}"
+                               FontSize="10" FontWeight="Bold"
+                               Foreground="#e8e8ea" VerticalAlignment="Center"/>
+                    <TextBlock Text="/ reduction" FontFamily="{StaticResource MonoFont}"
+                               FontSize="9" Foreground="#444450"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Window controls -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal"
+                            VerticalAlignment="Center" Margin="0,0,8,0">
+                    <Button Content="—" Click="MinimizeBtn_Click"
+                            Width="28" Height="28" Margin="0,0,2,0"
+                            Background="Transparent" Foreground="#666672"
+                            BorderThickness="0" FontSize="12" Cursor="Hand"/>
+                    <Button Content="✕" Click="CloseBtn_Click"
+                            Width="28" Height="28"
+                            Background="Transparent" Foreground="#666672"
+                            BorderThickness="0" FontSize="11" Cursor="Hand"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- ── Classification banner ──────────────────────────────────── -->
+            <Border Grid.Row="1"
+                    Background="#0a1a14"
+                    BorderBrush="#0d2a1e"
+                    BorderThickness="0,1,0,1"
+                    Padding="14,6">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
+                    <Ellipse Width="6" Height="6" Fill="#00c49a" VerticalAlignment="Center"/>
+                    <TextBlock Text="LOCAL · DATA NEVER LEAVES DEVICE"
+                               FontFamily="{StaticResource MonoFont}"
+                               FontSize="8" FontWeight="Bold"
+                               Foreground="#00c49a"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ── Stats bar ──────────────────────────────────────────────── -->
+            <Border Grid.Row="2" Background="#0d0d0f"
+                    BorderBrush="#1e1e22" BorderThickness="0,0,0,1"
+                    Padding="14,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding StatsLine}"
+                               FontFamily="{StaticResource MonoFont}"
+                               FontSize="10" Foreground="#666672"
+                               VerticalAlignment="Center"/>
+
+                    <!-- Reduction % badge -->
+                    <Border Grid.Column="1"
+                            Visibility="Collapsed"
+                            Background="#0d2a1e" CornerRadius="3" Padding="8,3">
+                        <TextBlock FontFamily="{StaticResource MonoFont}" FontSize="10"
+                                   FontWeight="Bold" Foreground="#00c49a">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0:F1}% saved">
+                                    <Binding Path="ReductionPct"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ── Input area ─────────────────────────────────────────────── -->
+            <Grid Grid.Row="3" Margin="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="#0d0d0f" Padding="14,8">
+                    <TextBlock Text="INPUT" FontFamily="{StaticResource MonoFont}"
+                               FontSize="8" FontWeight="Bold" Foreground="#333340"/>
+                </Border>
+
+                <ScrollViewer Grid.Row="1" Style="{StaticResource MinimalScrollViewer}"
+                              VerticalScrollBarVisibility="Auto">
+                    <TextBox Style="{StaticResource DarkTextBox}"
+                             Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"
+                             TextWrapping="Wrap" AcceptsReturn="True"
+                             Padding="14" VerticalAlignment="Stretch"
+                             MinHeight="140"
+                             xml:lang="en-US">
+                        <TextBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="0"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- ── Reduce button ──────────────────────────────────────────── -->
+            <Border Grid.Row="4" Background="#0d0d0f"
+                    BorderBrush="#1e1e22" BorderThickness="0,1,0,1"
+                    Padding="14,10">
+                <Button Command="{Binding ReduceCommand}"
+                        HorizontalAlignment="Stretch"
+                        Height="36" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bg" Background="#5b6af0" CornerRadius="4">
+                                <TextBlock Text="REDUCE  →"
+                                           FontFamily="{StaticResource MonoFont}"
+                                           FontSize="10" FontWeight="Bold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bg" Property="Background" Value="#4a59df"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="bg" Property="Background" Value="#1e1e26"/>
+                                    <Setter TargetName="bg" Property="Opacity" Value="0.5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Border>
+
+            <!-- ── Output area ────────────────────────────────────────────── -->
+            <Grid Grid.Row="5" Margin="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="#0a120e" Padding="14,8">
+                    <TextBlock Text="COMPRESSED OUTPUT" FontFamily="{StaticResource MonoFont}"
+                               FontSize="8" FontWeight="Bold" Foreground="#1a3a28"/>
+                </Border>
+
+                <ScrollViewer Grid.Row="1" Style="{StaticResource MinimalScrollViewer}"
+                              VerticalScrollBarVisibility="Auto">
+                    <TextBox Style="{StaticResource DarkTextBox}"
+                             Text="{Binding OutputText, Mode=OneWay}"
+                             TextWrapping="Wrap" IsReadOnly="True"
+                             Padding="14" MinHeight="120"
+                             Foreground="#00c49a"
+                             Background="#030a06"/>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- ── Action buttons ─────────────────────────────────────────── -->
+            <Border Grid.Row="6" Background="#0d0d0f"
+                    BorderBrush="#1e1e22" BorderThickness="0,1,0,1"
+                    Padding="14,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Accept button -->
+                    <Button Grid.Column="0" Command="{Binding AcceptCommand}"
+                            Height="36" Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="bg" Background="#0d2a1e"
+                                        BorderBrush="#00c49a" BorderThickness="1"
+                                        CornerRadius="4">
+                                    <TextBlock Text="✓  ACCEPT  —  COPY TO CLIPBOARD"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               FontSize="9" FontWeight="Bold"
+                                               Foreground="#00c49a"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="bg" Property="Background" Value="#0f3320"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="bg" Property="Opacity" Value="0.35"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <!-- Clear button -->
+                    <Button Grid.Column="2" Command="{Binding ClearCommand}"
+                            Width="70" Height="36" Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="bg" Background="#1a1a1e"
+                                        BorderBrush="#2a2a30" BorderThickness="1"
+                                        CornerRadius="4">
+                                    <TextBlock Text="CLEAR"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               FontSize="9" Foreground="#666672"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="bg" Property="Background" Value="#222228"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- ── Pass log ───────────────────────────────────────────────── -->
+            <Border Grid.Row="7" Background="#080808"
+                    BorderBrush="#1a1a1e" BorderThickness="0,1,0,0"
+                    Padding="14,10"
+                    Visibility="Collapsed">
+                <TextBlock Text="{Binding PassLog}"
+                           FontFamily="{StaticResource MonoFont}"
+                           FontSize="8" Foreground="#333340"
+                           TextWrapping="Wrap"/>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
